@@ -3,22 +3,21 @@ import { Switch } from "@headlessui/vue";
 import {
   ChevronDownIcon,
   CloudArrowDownIcon,
-  CloudArrowUpIcon,
   ExclamationTriangleIcon,
   HeartIcon,
   MoonIcon,
   SunIcon,
 } from "@heroicons/vue/20/solid";
+import { ref } from "vue";
 import Accordion from "./components/Accordion.vue";
 import Button from "./components/Button.vue";
 import CardVideo from "./components/CardVideo.vue";
 import CardWhyChooseUs from "./components/CardWhyChooseUs.vue";
 import HowToItem from "./components/HowToItem.vue";
+import Spinner from "./components/Spinner.vue";
+import { useApi } from "./composables/useApi";
 import { useDarkMode } from "./composables/useDarkMode";
 import { faqs, howTos } from "./constants";
-import { ref, watchEffect } from "vue";
-import { useApi } from "./composables/useApi";
-import Spinner from "./components/Spinner.vue";
 
 const { enabled } = useDarkMode();
 const query = ref("");
@@ -37,7 +36,7 @@ const handleChangeQuery = (e) => {
 };
 
 const handleGetData = () => {
-  if (query.value.includes("youtube.com")) {
+  if (query.value.includes("youtube.com") || query.value.includes("youtu.be")) {
     getData("ytdl/info", query.value);
   }
 
@@ -156,14 +155,23 @@ const handleDownload = async () => {
 
       <CardVideo
         v-if="!isLoading && !error && Object.keys(data).length > 0"
-        :title="query.includes('youtube.com') ? data.title : data.result.desc"
+        :title="
+          query.includes('youtube.com') || query.includes('youtu.be')
+            ? data.title
+            : data.result.desc
+        "
         :source-url="data.video_url || query"
-        :is-youtube="query.includes('youtube.com')"
+        :is-youtube="
+          query.includes('youtube.com') || query.includes('youtu.be')
+        "
       >
         <template #thumbnail>
           <img
-            v-if="query.includes('youtube.com') && data?.thumbnails"
-            :src="data?.thumbnails[0].url"
+            v-if="
+              query.includes('youtube.com') ||
+              (query.includes('youtu.be') && data?.thumbnails)
+            "
+            :src="data?.thumbnails[data?.thumbnails.length - 1].url"
             :alt="data?.title"
             class="absolute inset-0 size-full rounded-lg object-cover"
           />
