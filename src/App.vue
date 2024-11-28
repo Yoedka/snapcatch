@@ -97,7 +97,7 @@ const handleDownload = async () => {
       class="flex flex-col justify-center items-center min-h-80 rounded-[2rem] bg-slate-100 dark:bg-stone-600 px-2 text-center relative z-20 py-10"
     >
       <img
-        src="./assets/img/hero-section.jpg"
+        src="./assets/img/hero-section.webp"
         alt="a group of people watching phone"
         class="absolute size-full inset-0 object-cover rounded-[2rem] z-10 opacity-30 grayscale"
       />
