@@ -7,6 +7,8 @@ import {
   HeartIcon,
   MoonIcon,
   SunIcon,
+  ClipboardIcon,
+  XMarkIcon,
 } from "@heroicons/vue/20/solid";
 import { ref } from "vue";
 import Accordion from "./components/Accordion.vue";
@@ -17,6 +19,7 @@ import HowToItem from "./components/HowToItem.vue";
 import Spinner from "./components/Spinner.vue";
 import { useApi } from "./composables/useApi";
 import { useDarkMode } from "./composables/useDarkMode";
+import { useClipboard } from "./composables/useClipboard";
 import { faqs, howTos } from "./constants";
 
 const { enabled } = useDarkMode();
@@ -28,6 +31,8 @@ const {
   data: downloadData,
   getData: downloadVideo,
 } = useApi();
+const { pasteFromClipboard } = useClipboard();
+
 const selectedRes = ref("Choose One");
 
 const handleChangeQuery = (e) => {
@@ -65,6 +70,17 @@ const handleDownload = async () => {
   } else {
     window.open(selectedRes.value, "_blank");
   }
+};
+
+const handlePasteFromClipboard = async (e) => {
+  e.preventDefault();
+  let text = await pasteFromClipboard();
+  let acceptedText = (text.includes("youtube.com") || text.includes("youtu.be") || text.includes("tiktok.com")) ? text : '';
+  query.value = acceptedText;
+};
+
+const handleClearInput = () => {
+  query.value = "";
 };
 </script>
 
@@ -122,9 +138,14 @@ const handleDownload = async () => {
           type="url"
           class="bg-transparent border-none focus-within:outline-none flex-1 text-ellipsis text-sm text-center sm:text-start dark:text-white dark:placeholder:text-secondary-dark/50"
           placeholder="Insert your link here"
+          v-model="query"
           @change="(e) => handleChangeQuery(e)"
           required
         />
+        <button class="sm:flex ml-1" :class="{ 'text-white': enabled, 'text-black': !enabled }">
+            <ClipboardIcon class="h-5 w-5 mr-2" v-if="!query" @click="handlePasteFromClipboard"/>
+            <XMarkIcon class="h-5 w-5 mr-2" v-else @click="handleClearInput"/>
+        </button>
         <Button type="submit" class="hidden sm:flex" :disabled="isLoading">
           <template v-if="!isLoading"> Search </template>
           <template v-else>
