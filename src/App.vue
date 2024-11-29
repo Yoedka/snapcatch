@@ -98,8 +98,8 @@ const handleClearInput = () => {
           <span class="sr-only">Use setting</span>
           <span
             aria-hidden="true"
-            :class="enabled ? 'translate-x-[30px]' : 'translate-x-[2px]'"
-            class="pointer-events-none size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out grid place-items-center translate-y-[2px]"
+            :class="enabled ? 'translate-x-[21px]' : 'translate-x-[2px]'"
+            class="pointer-events-none size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out grid place-items-center translate-y-[1px]"
           >
             <component :is="!enabled ? SunIcon : MoonIcon" class="size-3" />
           </span>
