@@ -7,6 +7,8 @@ import {
   HeartIcon,
   MoonIcon,
   SunIcon,
+  ClipboardIcon,
+  XMarkIcon,
 } from "@heroicons/vue/20/solid";
 import { ref } from "vue";
 import Accordion from "./components/Accordion.vue";
@@ -17,6 +19,7 @@ import HowToItem from "./components/HowToItem.vue";
 import Spinner from "./components/Spinner.vue";
 import { useApi } from "./composables/useApi";
 import { useDarkMode } from "./composables/useDarkMode";
+import { useClipboard } from "./composables/useClipboard";
 import { faqs, howTos } from "./constants";
 
 const { enabled } = useDarkMode();
@@ -28,6 +31,8 @@ const {
   data: downloadData,
   getData: downloadVideo,
 } = useApi();
+const { pasteFromClipboard } = useClipboard();
+
 const selectedRes = ref("Choose One");
 
 const handleChangeQuery = (e) => {
@@ -66,6 +71,17 @@ const handleDownload = async () => {
     window.open(selectedRes.value, "_blank");
   }
 };
+
+const handlePasteFromClipboard = async (e) => {
+  e.preventDefault();
+  let text = await pasteFromClipboard();
+  let acceptedText = (text.includes("youtube.com") || text.includes("youtu.be") || text.includes("tiktok.com")) ? text : '';
+  query.value = acceptedText;
+};
+
+const handleClearInput = () => {
+  query.value = "";
+};
 </script>
 
 <template>
@@ -82,8 +98,8 @@ const handleDownload = async () => {
           <span class="sr-only">Use setting</span>
           <span
             aria-hidden="true"
-            :class="enabled ? 'translate-x-[30px]' : 'translate-x-[2px]'"
-            class="pointer-events-none size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out grid place-items-center translate-y-[2px]"
+            :class="enabled ? 'translate-x-[21px]' : 'translate-x-[2px]'"
+            class="pointer-events-none size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out grid place-items-center translate-y-[1px]"
           >
             <component :is="!enabled ? SunIcon : MoonIcon" class="size-3" />
           </span>
@@ -97,7 +113,7 @@ const handleDownload = async () => {
       class="flex flex-col justify-center items-center min-h-80 rounded-[2rem] bg-slate-100 dark:bg-stone-600 px-2 text-center relative z-20 py-10"
     >
       <img
-        src="./assets/img/hero-section.jpg"
+        src="./assets/img/hero-section.webp"
         alt="a group of people watching phone"
         class="absolute size-full inset-0 object-cover rounded-[2rem] z-10 opacity-30 grayscale"
       />
@@ -122,9 +138,14 @@ const handleDownload = async () => {
           type="url"
           class="bg-transparent border-none focus-within:outline-none flex-1 text-ellipsis text-sm text-center sm:text-start dark:text-white dark:placeholder:text-secondary-dark/50"
           placeholder="Insert your link here"
+          v-model="query"
           @change="(e) => handleChangeQuery(e)"
           required
         />
+        <button class="sm:flex ml-1" :class="{ 'text-white': enabled, 'text-black': !enabled }">
+            <ClipboardIcon class="h-5 w-5 mr-2" v-if="!query" @click="handlePasteFromClipboard"/>
+            <XMarkIcon class="h-5 w-5 mr-2" v-else @click="handleClearInput"/>
+        </button>
         <Button type="submit" class="hidden sm:flex" :disabled="isLoading">
           <template v-if="!isLoading"> Search </template>
           <template v-else>
